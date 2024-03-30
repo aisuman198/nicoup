@@ -1,0 +1,40 @@
+{
+    "manifest_version": 3,
+    "name": "niconico Upload helper",
+    "version": "0.0.1",
+    "description": "ニコニコ動画の動画アップロードヘルパー",
+    "permissions": [
+        "scripting",
+        "storage",
+        "activeTab",
+        "webRequest"
+    ],
+    "host_permissions": [
+        "https://www.upload.nicovideo.jp/*"
+    ],
+    "icons": {
+        "32": "resource/icon.png",
+        "64": "resource/icon.png",
+        "128": "resource/icon.png"
+    },
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self';",
+        "sandbox": "sandbox allow-scripts; allow-same-origin;"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.upload.nicovideo.jp/niconico-garage/video/videos/*"
+            ],
+            "js": [
+                "app/js/content.js"
+            ]
+        }
+    ],
+    "action": {
+        "default_popup": "app/html/index.html",
+        "default_icon": {
+            "128": "resource/icon.png"
+        }
+    }
+}
