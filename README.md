@@ -4,6 +4,7 @@
 
 ## どう使うの？
 こちらからどうぞ
+
 https://github.com/aisuman198/nicoup/wiki
 
 ## HowToInstall
