@@ -6,6 +6,6 @@
 ドキュメント整備中
 
 ## 機能を追加してほしい/バグを見つけた
-[ここ](https://github.com/aisuman198/nicoup/issues/new/choose) からもろもろ記載してissuを起票するか、forkしたリポジトリからPRを投げてください
+[ここ](https://github.com/aisuman198/nicoup/issues/new/choose) からもろもろ記載してissueを起票するか、forkしたリポジトリからPRを投げてください
 
 即時対応は難しいですがなんとかします
