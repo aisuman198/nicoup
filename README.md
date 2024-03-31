@@ -3,7 +3,11 @@
 （Chrome拡張用）
 
 ## どう使うの？
-ドキュメント整備中
+こちらからどうぞ
+https://github.com/aisuman198/nicoup/wiki
+
+## HowToInstall
+TODO
 
 ## 機能を追加してほしい/バグを見つけた/問い合わせしたい
 [ここ](https://github.com/aisuman198/nicoup/issues/new/choose) からもろもろ記載してissueを起票するか、forkしたリポジトリからPRを投げてください
