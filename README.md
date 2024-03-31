@@ -3,7 +3,7 @@
 （Chrome拡張用）
 
 ## どう使うの？
-[こちら](https://github.com/aisuman198/nicoup/wiki) 
+[使い方](https://github.com/aisuman198/nicoup/wiki) 
 
 ## HowToInstall
 TODO
