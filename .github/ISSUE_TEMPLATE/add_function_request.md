@@ -2,7 +2,7 @@
 name: 機能追加/修正の要望
 about: 追加/修正してほしい機能について記載してください
 title: "[機能リクエスト] "
-labels: request
+labels: Request
 assignees: ''
 ---
 
