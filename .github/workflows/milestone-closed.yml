@@ -1,0 +1,29 @@
+name: Create Next Version Milestone
+
+on:
+  milestone:
+    types: [closed]
+
+jobs:
+  create-next-version-milestone:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Create Next Version Milestone
+      env:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        OWNER: ${{ github.repository_owner }}
+        REPO: ${{ github.event.repository.name }}
+      run: |
+        # 現在のマイルストーンのタイトルを取得し、バージョン番号を解析
+        CURRENT_VERSION=$(echo ${{ github.event.milestone.title }} | grep -oP '\d+\.\d+\.\d+')
+        IFS='.' read -ra VERSION <<< "$CURRENT_VERSION"
+        PATCH_VERSION=$((VERSION[2]+1))
+        NEXT_VERSION="${VERSION[0]}.${VERSION[1]}.$PATCH_VERSION"
+        
+        # 次のバージョンのマイルストーンを作成
+        curl -s -X POST -H "Authorization: token $ACCESS_TOKEN" -H "Accept: application/vnd.github.v3+json" \
+          -d "{\"title\":\"$NEXT_VERSION\"}" \
+          "https://api.github.com/repos/$OWNER/$REPO/milestones"
