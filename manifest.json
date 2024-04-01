@@ -6,8 +6,7 @@
     "permissions": [
         "scripting",
         "storage",
-        "activeTab",
-        "webRequest"
+        "activeTab"
     ],
     "host_permissions": [
         "https://www.upload.nicovideo.jp/*"
