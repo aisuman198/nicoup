@@ -11,15 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tabs[0].url.includes("https://www.upload.nicovideo.jp/niconico-garage/video/videos/")) {
                 chrome.scripting.executeScript({
                     target: { tabId: tab.id },
-                    files: ['./app/js/content.js']
-                }, () => {
-                    chrome.scripting.executeScript({
-                        target: { tabId: tab.id },
-                        function: function () {
-                            const uploader = new VideoUploader();
-                            uploader.exec();
-                        }
-                    });
+                    function: function () {
+                        const uploader = new VideoUploader();
+                        uploader.exec();
+                    }
                 });
             } else {
                 messageSelector('#errrOutputInvalidPage');
