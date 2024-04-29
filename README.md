@@ -17,3 +17,10 @@ TODO
 問い合わせに関しては [X](https://twitter.com/aisu_is_198) へご連絡頂いても大丈夫です
 
 即時対応は難しいですがなんとかします
+
+## サポート環境
+
+| 項目 | 値 |
+| --- | --- |
+| 対応OS | Windows11以降 / MacOS Monterey以降 |
+| ブラウザ | Google Chromeの最新版（正式版） |
