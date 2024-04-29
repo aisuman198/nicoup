@@ -38,7 +38,8 @@ class VideoUploader {
 
     makePayload(id, title, detail, tags, genreKey, seriesId, registeredAt) {
         const publishTimerUse = registeredAt !== null;
-        return {
+        const needSeries = typeof seriesId !== 'undefined' && seriesId !== null && seriesId !== '';
+        const payload = {
             "id": id,
             "title": title,
             "detail": detail,
@@ -46,7 +47,6 @@ class VideoUploader {
             "publish": true,
             "publishTimer": { "use": publishTimerUse, "registeredAt": registeredAt },
             "videoLive": { "enable": false },
-            "series": { "id": seriesId, "addToHead": false },
             "tags": tags,
             "genreKey": genreKey,
             "thumbnail": {
@@ -71,6 +71,15 @@ class VideoUploader {
             "thanksMessage": { "isVisible": false, "content": "" },
             "commonsParentIds": []
         }
+
+        // シリーズの追加が必要な場合
+        if (needSeries) {
+            console.log("needSeries");
+            console.log(seriesId);
+            payload.series = { "id": seriesId, "addToHead": false }
+        }
+
+        return payload;
     }
 
     async requestDraftApi(videoId, payload) {
