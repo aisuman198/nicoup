@@ -11,7 +11,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tabs[0].url.includes("https://www.upload.nicovideo.jp/niconico-garage/video/videos/")) {
                 chrome.scripting.executeScript({
                     target: { tabId: tab.id },
-                    function: proccess,
+                    files: ['./app/js/content.js']
+                }, () => {
+                    chrome.scripting.executeScript({
+                        target: { tabId: tab.id },
+                        function: function () {
+                            const uploader = new VideoUploader();
+                            uploader.exec();
+                        }
+                    });
                 });
             } else {
                 messageSelector('#errrOutputInvalidPage');
@@ -52,7 +60,7 @@ function loadSetting(setting) {
     if (!setting) {
         console.log('No settings found');
         messageSelector('#defaultMessage');
-        return; // 早期リターンを使ってネストを減らす
+        return;
     }
     if (setting.title !== undefined) {
         document.querySelector('#title').value = setting.title;
