@@ -9,8 +9,8 @@
 [使い方](https://github.com/aisuman198/nicoup/wiki) 
 
 ## HowToInstall
-### Chrome拡張
-https://chromewebstore.google.com/detail/niconico-upload-helper/ijmeoamglgfjbphkmnckfeannooacahp?utm_source=ext_app_menu
+[ChromeWebStore](https://chromewebstore.google.com/detail/niconico-upload-helper/ijmeoamglgfjbphkmnckfeannooacahp?utm_source=ext_app_menu) よりインストールしてください
+
 
 
 ## 機能を追加してほしい/バグを見つけた/問い合わせしたい
