@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-            if (tabs[0].url.includes("https://www.upload.nicovideo.jp/niconico-garage/video/videos/")) {
+            if (tabs[0].url.includes("https://garage.nicovideo.jp/niconico-garage/video/videos/")) {
                 chrome.scripting.executeScript({
                     target: { tabId: tab.id },
                     function: function () {
