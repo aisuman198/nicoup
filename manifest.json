@@ -23,7 +23,7 @@
     "content_scripts": [
         {
             "matches": [
-                "https://www.upload.nicovideo.jp/niconico-garage/video/videos/*"
+                "https://garage.nicovideo.jp/niconico-garage/video/videos/*"
             ],
             "js": [
                 "app/js/content.js"
