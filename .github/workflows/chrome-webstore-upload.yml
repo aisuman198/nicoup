@@ -1,0 +1,101 @@
+name: Chrome Web Store Upload
+
+on:
+  # 手動実行（主要なトリガー）
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'アップロード後に公開も行う'
+        required: false
+        type: boolean
+        default: false
+      dry-run:
+        description: 'dry-run（実際のアップロードを行わずバリデーションのみ）'
+        required: false
+        type: boolean
+        default: false
+
+  # タグプッシュ時の自動アップロード（公開はしない）
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    # タグプッシュ時は main ブランチのタグのみ許可
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: manifest.json のバージョン確認
+        id: version
+        run: |
+          VERSION=$(grep -o '"version": *"[^"]*"' manifest.json | grep -o '"[^"]*"$' | tr -d '"')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "manifest.json version: $VERSION"
+
+          # タグプッシュ時: タグとmanifestのバージョン一致を検証
+          if [ "${{ github.event_name }}" = "push" ]; then
+            TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+            if [ "$VERSION" != "$TAG_VERSION" ]; then
+              echo "::error::タグ v${TAG_VERSION} と manifest.json のバージョン ${VERSION} が一致しません"
+              exit 1
+            fi
+          fi
+
+      - name: 拡張機能をパッケージング
+        run: |
+          chmod +x .github/scripts/package-extension.sh
+          .github/scripts/package-extension.sh "nicoup-v${{ steps.version.outputs.version }}.zip"
+
+      - name: パッケージをアーティファクトとして保存
+        uses: actions/upload-artifact@v4
+        with:
+          name: nicoup-v${{ steps.version.outputs.version }}
+          path: nicoup-v${{ steps.version.outputs.version }}.zip
+          retention-days: 90
+
+      - name: Chrome Web Store にアップロード
+        env:
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+        run: |
+          chmod +x .github/scripts/chrome-webstore-upload.sh
+
+          # オプション組み立て
+          OPTS=""
+          # workflow_dispatch の場合は入力値を使用、タグプッシュ時は公開しない
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ inputs.publish }}" = "true" ]; then
+              OPTS="$OPTS --publish"
+            fi
+            if [ "${{ inputs.dry-run }}" = "true" ]; then
+              OPTS="$OPTS --dry-run"
+            fi
+          fi
+
+          .github/scripts/chrome-webstore-upload.sh \
+            "nicoup-v${{ steps.version.outputs.version }}.zip" \
+            $OPTS
+
+      - name: 結果サマリー
+        if: always()
+        run: |
+          echo "## Chrome Web Store Upload" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **バージョン**: ${{ steps.version.outputs.version }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **トリガー**: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "- **dry-run**: ${{ inputs.dry-run }}" >> "$GITHUB_STEP_SUMMARY"
+            echo "- **公開**: ${{ inputs.publish }}" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- **公開**: false（タグプッシュ時はアップロードのみ）" >> "$GITHUB_STEP_SUMMARY"
+          fi
