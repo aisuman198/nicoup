@@ -26,6 +26,7 @@
                 "https://garage.nicovideo.jp/niconico-garage/video/videos/*"
             ],
             "js": [
+                "app/js/helpers.js",
                 "app/js/content.js"
             ]
         }

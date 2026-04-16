@@ -11,7 +11,7 @@ class VideoUploader {
     }
 
     async request(setting) {
-        const id = this.getId();
+        const id = VideoUploaderHelpers.extractVideoId(window.location.href);
         if (!id) {
             this.messageSelector('#errrOutputInvalidPage');
             return;
@@ -21,9 +21,9 @@ class VideoUploader {
             this.messageSelector('#errrOutputMissingParameter');
             return;
         }
-        const detail = this.makeDetail(setting.detail);
-        const tags = this.makeTags(setting.tags);
-        const registeredAt = this.formatDateTime(setting.publishHour);
+        const detail = VideoUploaderHelpers.makeDetail(setting.detail);
+        const tags = VideoUploaderHelpers.makeTags(setting.tags);
+        const registeredAt = VideoUploaderHelpers.formatDateTime(setting.publishHour);
         const payload = this.makePayload(
             id,
             title,
@@ -111,36 +111,10 @@ class VideoUploader {
         }
     }
 
-    getId() {
-        const currentPageUrl = window.location.href;
-        const regex = /videos\/(?:sm)?(\d+)/;
-        const match = currentPageUrl.match(regex);
-        return match ? parseInt(match[1], 10) : null;
-    }
-
     makeTitle(title) {
         const textPlaceHolder = '{{defaultInput}}';
         const titleElement = document.querySelector('input[name="title"]');
         return title.replace(textPlaceHolder, titleElement.value);
-    }
-
-    makeDetail(detail) {
-        return detail.replace(/\n/g, '<br>');
-    }
-
-    makeTags(tags) {
-        return tags.split(' ');
-    }
-
-    formatDateTime(hour) {
-        console.log("formatDateTime");
-        console.log(hour);
-        if (typeof hour === 'undefined') {
-            return null;
-        }
-        const now = new Date();
-        now.setHours(hour, 0, 0, 0);
-        return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}T${now.getHours().toString().padStart(2, '0')}:00:00+09:00`;
     }
 
     messageSelector(messageId) {
