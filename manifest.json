@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "niconico Upload helper",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "ニコニコ動画の動画アップロードヘルパー",
     "permissions": [
         "scripting",
@@ -26,6 +26,7 @@
                 "https://garage.nicovideo.jp/niconico-garage/video/videos/*"
             ],
             "js": [
+                "app/js/helpers.js",
                 "app/js/content.js"
             ]
         }
