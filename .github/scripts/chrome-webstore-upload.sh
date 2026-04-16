@@ -152,9 +152,17 @@ if [ "$PUBLISH" = true ]; then
     exit 1
   fi
 
-  PUBLISH_STATUS=$(echo "$PUBLISH_BODY" | grep -o '"status"\s*:\s*\[\s*"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"')
+  PUBLISH_STATUS=$(echo "$PUBLISH_BODY" | grep -o '"status" *: *\[ *"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"') || true
   echo "公開リクエスト完了 (status: ${PUBLISH_STATUS:-確認中})"
-  echo "注意: Chrome Web Store の審査が完了するまで公開は反映されません"
+
+  case "${PUBLISH_STATUS}" in
+    OK)
+      echo "公開が即座に反映されました" ;;
+    ITEM_PENDING_REVIEW)
+      echo "審査待ち: Chrome Web Store の審査が完了すると自動的に公開されます" ;;
+    ""|*)
+      echo "注意: Chrome Web Store の審査が完了するまで公開は反映されません" ;;
+  esac
 else
   echo ""
   echo "アップロードのみ完了しました（公開はしていません）"
