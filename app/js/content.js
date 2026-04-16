@@ -113,7 +113,7 @@ class VideoUploader {
 
     getId() {
         const currentPageUrl = window.location.href;
-        const regex = /sm(\d+)/;
+        const regex = /videos\/(?:sm)?(\d+)/;
         const match = currentPageUrl.match(regex);
         return match ? parseInt(match[1], 10) : null;
     }
