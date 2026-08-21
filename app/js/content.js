@@ -1,7 +1,7 @@
 class VideoUploader {
     constructor() {
         this.frontendId = 23;
-        this.urlFormat = 'https://garage.nicovideo.jp/v2/videos/{{videoId}}/draft';
+        this.urlFormat = 'https://garage.nicovideo.jp/api/v2/videos/{{videoId}}/draft';
     }
 
     async exec() {
