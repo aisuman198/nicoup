@@ -81,7 +81,7 @@ TOKEN_RESPONSE=$(curl -s -X POST "https://oauth2.googleapis.com/token" \
   -d "refresh_token=${CHROME_REFRESH_TOKEN}" \
   -d "grant_type=refresh_token")
 
-ACCESS_TOKEN=$(echo "$TOKEN_RESPONSE" | grep -o '"access_token": *"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"')
+ACCESS_TOKEN=$(echo "$TOKEN_RESPONSE" | grep -o '"access_token": *"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"') || true
 
 if [ -z "$ACCESS_TOKEN" ]; then
   echo "Error: アクセストークンの取得に失敗しました" >&2
@@ -122,7 +122,7 @@ if [ "$UPLOAD_HTTP_CODE" -ne 200 ]; then
 fi
 
 # uploadState を確認
-UPLOAD_STATE=$(echo "$UPLOAD_BODY" | grep -o '"uploadState": *"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"')
+UPLOAD_STATE=$(echo "$UPLOAD_BODY" | grep -o '"uploadState": *"[^"]*"' | grep -o '"[^"]*"$' | tr -d '"') || true
 if [ "$UPLOAD_STATE" != "SUCCESS" ]; then
   echo "Error: アップロードは完了しましたが、状態が SUCCESS ではありません: $UPLOAD_STATE" >&2
   echo "$UPLOAD_BODY" >&2
