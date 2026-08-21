@@ -20,33 +20,47 @@ GitHub Actions から Chrome Web Store API を使って拡張機能のアップ�
 
 1. [認証情報](https://console.cloud.google.com/apis/credentials) を開く
 2. 「認証情報を作成」→「OAuth クライアント ID」
-3. アプリケーションの種類: 「デスクトップアプリ」
-4. 作成後、**クライアントID** と **クライアントシークレット** をメモ
+3. アプリケーションの種類: **「ウェブアプリケーション」**
+   - OAuth Playground を使うため、redirect_uri を登録できるタイプを選ぶ
+4. 「承認済みのリダイレクト URI」に以下を追加:
+   ```
+   https://developers.google.com/oauthplayground
+   ```
+5. 作成後、**クライアントID** と **クライアントシークレット** をメモ
 
-### 1-4. リフレッシュトークンの取得
+> **注意**: 以前は「デスクトップアプリ」＋ `redirect_uri=urn:ietf:wg:oauth:2.0:oob` の OOB フローが使えましたが、
+> 2022 年以降 Google が段階的に停止しており、現在は多くのアカウントでブロックされます。
+> このガイドは OAuth 2.0 Playground を使う手順を採用しています。
 
-ブラウザで以下のURLにアクセス（`{CLIENT_ID}` を置換）:
+### 1-4. OAuth 同意画面の Publishing status を確認
 
-```
-https://accounts.google.com/o/oauth2/auth?response_type=code&scope=https://www.googleapis.com/auth/chromewebstore&client_id={CLIENT_ID}&redirect_uri=urn:ietf:wg:oauth:2.0:oob
-```
+1. [OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent) を開く
+2. **Publishing status** を確認
+   - **Testing**: refresh token が **7 日で失効** するため実運用に向かない
+   - **In production**: 失効は「6 ヶ月間未使用」のときのみ
+3. Testing のままなら **「PUBLISH APP」** で In production に昇格させる
+   - Chrome Web Store scope は sensitive scope 扱いのため verification 画面が出るが、
+     個人利用アプリなら unverified のまま Production 化して警告付きで運用可能
 
-承認後に表示される認可コードを使って、トークンを取得:
+### 1-5. リフレッシュトークンの取得（OAuth Playground 経由）
 
-```bash
-curl -s -X POST "https://oauth2.googleapis.com/token" \
-  -d "client_id={CLIENT_ID}" \
-  -d "client_secret={CLIENT_SECRET}" \
-  -d "code={AUTH_CODE}" \
-  -d "grant_type=authorization_code" \
-  -d "redirect_uri=urn:ietf:wg:oauth:2.0:oob"
-```
+1. https://developers.google.com/oauthplayground/ を開く
+2. 右上の **歯車アイコン** をクリック
+3. **Use your own OAuth credentials** にチェックを入れ、
+   1-3 で取得した **OAuth Client ID / Client Secret** を入力して閉じる
+4. 左サイドの **Step 1** の下、「Input your own scopes」欄に以下を貼り付け:
+   ```
+   https://www.googleapis.com/auth/chromewebstore
+   ```
+5. **Authorize APIs** をクリック → Google のログイン & 同意画面で許可
+   - 「このアプリは Google で確認されていません」と出た場合は Advanced → 続行
+6. Playground の **Step 2** で **Exchange authorization code for tokens** をクリック
+7. 右側レスポンスに表示される `refresh_token` をコピー
 
-レスポンスの `refresh_token` をメモする。
-
-> **注意**: `redirect_uri=urn:ietf:wg:oauth:2.0:oob` は Google が廃止予定としています。
-> 動作しない場合は、ローカルサーバーを使ったフロー（localhost redirect）に切り替えてください。
-> 参考: https://developers.google.com/identity/protocols/oauth2/native-app
+> **refresh_token が空で返る場合**:
+> 同一ユーザー × 同一クライアントで再認可すると、Google は refresh_token を返さないことがあります。
+> [Google アカウント > サードパーティのアクセス](https://myaccount.google.com/permissions) で該当アプリのアクセスを一度削除してから、
+> 手順 5 からやり直してください。
 
 ## 2. GitHub Secrets の設定
 
@@ -57,7 +71,7 @@ curl -s -X POST "https://oauth2.googleapis.com/token" \
 | `CHROME_EXTENSION_ID` | 拡張機能のID | Chrome Web Store の URL から取得（`https://chrome.google.com/webstore/detail/{ID}`） |
 | `CHROME_CLIENT_ID` | OAuth2 クライアントID | 手順 1-3 で取得 |
 | `CHROME_CLIENT_SECRET` | OAuth2 クライアントシークレット | 手順 1-3 で取得 |
-| `CHROME_REFRESH_TOKEN` | OAuth2 リフレッシュトークン | 手順 1-4 で取得 |
+| `CHROME_REFRESH_TOKEN` | OAuth2 リフレッシュトークン | 手順 1-5 で取得 |
 
 ## 3. 使い方
 
@@ -100,8 +114,10 @@ git push origin v0.1.2
 リフレッシュトークンが失効した場合:
 
 1. ワークフローの「アクセストークン取得」ステップでエラーが出る
-2. 手順 1-4 を再実行して新しいリフレッシュトークンを取得
-3. GitHub Secrets の `CHROME_REFRESH_TOKEN` を更新
+   - 「レスポンス: {"error": "invalid_grant", ...}」が出ていれば refresh token 失効
+2. 手順 1-4 の Publishing status を再確認（Testing に戻っていないか）
+3. 手順 1-5 を再実行して新しいリフレッシュトークンを取得
+4. GitHub Secrets の `CHROME_REFRESH_TOKEN` を更新
 
 > Google OAuth2 のリフレッシュトークンは、以下の場合に失効します:
 > - 6ヶ月間使用しなかった場合

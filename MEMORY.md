@@ -1,0 +1,1 @@
+- `.github/scripts/chrome-webstore-upload.sh` は `set -euo pipefail` 下で `VAR=$(cmd | grep -o ...)` パターンを多用しており、grep が no-match で終了するとフォローの `if [ -z "$VAR" ]` 診断に到達せず silent exit する。新しい抽出を書き足すときは `|| true` を必ず付ける（a5c96d0, ec96c66 で既に同種修正）。
